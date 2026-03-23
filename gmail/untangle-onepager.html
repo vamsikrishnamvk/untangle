@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Untangle — One Pager</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1714;
+    --paper: #f5f0e8;
+    --cream: #ede7d9;
+    --gold: #b8863c;
+    --gold-light: #d4a85a;
+    --muted: #7a6e60;
+    --thread: #c4472a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Instrument Sans', sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left {
+    background: var(--ink);
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-left::before {
+    content: '';
+    position: absolute;
+    top: -100px; left: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(184,134,60,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .logo-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    font-size: 28px;
+  }
+
+  .logo-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--paper);
+    letter-spacing: 0.02em;
+  }
+
+  .hero-headline {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(38px, 5vw, 56px);
+    font-weight: 900;
+    color: var(--paper);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-headline em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    color: rgba(245,240,232,0.55);
+    max-width: 340px;
+    line-height: 1.7;
+    margin-top: 20px;
+  }
+
+  .hero-cta {
+    display: inline-block;
+    margin-top: 32px;
+    padding: 14px 28px;
+    background: var(--gold);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+
+  .hero-right {
+    background: var(--cream);
+    padding: 64px 56px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+
+  .chat-demo {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .chat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .bubble {
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.6;
+    max-width: 85%;
+    animation: fadeUp 0.5s ease forwards;
+    opacity: 0;
+  }
+
+  .bubble-user {
+    background: var(--ink);
+    color: var(--paper);
+    border-bottom-right-radius: 4px;
+    align-self: flex-end;
+    animation-delay: 0.2s;
+  }
+
+  .bubble-ai {
+    background: white;
+    color: var(--ink);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-bottom-left-radius: 4px;
+    font-style: italic;
+    align-self: flex-start;
+  }
+
+  .bubble-ai-1 { animation-delay: 0.5s; }
+  .bubble-ai-2 { animation-delay: 1.4s; }
+  .bubble-user-2 { animation-delay: 0.9s; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTIONS */
+  section { padding: 80px 64px; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+  }
+
+  /* PROBLEM */
+  .problem {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .problem .section-title { color: var(--paper); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+  }
+
+  .problem-card {
+    border-top: 2px solid rgba(184,134,60,0.4);
+    padding-top: 20px;
+  }
+
+  .problem-card-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .problem-card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--paper);
+    margin-bottom: 8px;
+  }
+
+  .problem-card-body {
+    font-size: 13px;
+    color: rgba(245,240,232,0.5);
+    line-height: 1.7;
+  }
+
+  /* WHO */
+  .who { background: var(--cream); }
+
+  .personas {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .persona {
+    background: white;
+    border-radius: 12px;
+    padding: 28px 24px;
+    border: 1px solid rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .persona:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  }
+
+  .persona::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--gold);
+  }
+
+  .persona-emoji { font-size: 32px; margin-bottom: 14px; }
+  .persona-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .persona-pain {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 14px;
+  }
+
+  .persona-value {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  /* HOW IT WORKS */
+  .how { background: var(--paper); }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 48px;
+    position: relative;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 22px; left: 10%; right: 10%;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, var(--gold) 0, var(--gold) 6px, transparent 6px, transparent 14px);
+  }
+
+  .step { padding: 0 16px; text-align: center; }
+
+  .step-num {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .step-body {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* DIFFERENTIATION */
+  .diff {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .diff-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    margin-top: 48px;
+    align-items: start;
+  }
+
+  .diff-table { width: 100%; border-collapse: collapse; }
+  .diff-table th {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-align: left;
+    padding: 0 0 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .diff-table td {
+    padding: 12px 0;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: top;
+  }
+
+  .diff-table td:first-child { color: rgba(245,240,232,0.5); padding-right: 24px; }
+  .diff-table td:last-child { color: var(--paper); }
+
+  .quote-block {
+    border-left: 3px solid var(--gold);
+    padding: 20px 24px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .quote-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-style: italic;
+    color: var(--paper);
+    line-height: 1.5;
+    margin-bottom: 12px;
+  }
+
+  .quote-attr {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 0.08em;
+  }
+
+  /* 30 DAY PLAN */
+  .plan { background: var(--cream); }
+
+  .weeks {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 48px;
+  }
+
+  .week {
+    background: white;
+    border-radius: 10px;
+    padding: 24px 20px;
+    border: 1px solid rgba(0,0,0,0.06);
+    position: relative;
+  }
+
+  .week-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+
+  .week-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+
+  .task {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+    align-items: flex-start;
+  }
+
+  .task-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+
+  .week-goal {
+    margin-top: 16px;
+    padding: 10px 12px;
+    background: rgba(184,134,60,0.08);
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    line-height: 1.5;
+  }
+
+  /* PRICING */
+  .pricing { background: var(--paper); }
+
+  .price-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 48px;
+  }
+
+  .price-card {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    padding: 32px 28px;
+    background: white;
+    position: relative;
+  }
+
+  .price-card.featured {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: transparent;
+  }
+
+  .price-card.featured .price-label,
+  .price-card.featured .price-desc,
+  .price-card.featured .price-feature { color: rgba(245,240,232,0.6); }
+
+  .featured-badge {
+    position: absolute;
+    top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--gold);
+    color: white;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    padding: 4px 14px;
+    border-radius: 20px;
+  }
+
+  .price-tier {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .price-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .price-amount {
+    font-family: 'Playfair Display', serif;
+    font-size: 42px;
+    font-weight: 900;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .price-desc {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+
+  .price-feature {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .check { color: var(--gold); font-weight: 600; }
+
+  /* FOOTER */
+  footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 48px 64px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .footer-tagline {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(245,240,232,0.35);
+    letter-spacing: 0.1em;
+    margin-top: 4px;
+  }
+
+  .footer-contact {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  @media (max-width: 768px) {
+    .hero { grid-template-columns: 1fr; }
+    .problem-grid, .personas, .steps, .weeks, .price-grid { grid-template-columns: 1fr; }
+    .diff-grid { grid-template-columns: 1fr; }
+    section { padding: 48px 24px; }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="logo-row">
+      <span class="logo-icon">🧵</span>
+      <span class="logo-name">Untangle</span>
+    </div>
+    <div>
+      <h1 class="hero-headline">Stop asking AI<br/>for answers.<br/><em>Start finding<br/>your own.</em></h1>
+      <p class="hero-sub">Untangle is an AI thinking partner that asks you the right questions — so you can make better decisions, faster.</p>
+      <a href="#plan" class="hero-cta">SEE THE 30-DAY PLAN →</a>
+    </div>
+    <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,240,232,0.2);letter-spacing:0.1em;">
+      FOR FOUNDERS · THERAPISTS · INDIVIDUALS
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="chat-label">A REAL UNTANGLE SESSION</div>
+    <div class="chat-demo">
+      <div class="bubble bubble-user">"I keep putting off launching. I've been 'almost ready' for 3 months."</div>
+      <div class="bubble bubble-ai bubble-ai-1">"What would have to be true for you to feel ready?"</div>
+      <div class="bubble bubble-user bubble-user-2">"I guess... nothing. There's always one more thing."</div>
+      <div class="bubble bubble-ai bubble-ai-2">"So what's the cost of waiting one more month?"</div>
+    </div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="section-label">THE PROBLEM</div>
+  <h2 class="section-title" style="color:var(--paper);max-width:600px;">Most people don't need more information.<br/>They need to <em style="color:var(--gold-light)">think more clearly.</em></h2>
+  <div class="problem-grid">
+    <div class="problem-card">
+      <div class="problem-card-icon">🔁</div>
+      <div class="problem-card-title">Going in circles</div>
+      <div class="problem-card-body">You've thought about this decision a hundred times. Something keeps stopping you but you can't name it.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-card-icon">🤖</div>
+      <div class="problem-card-title">AI gives you answers</div>
+      <div class="problem-card-body">ChatGPT tells you what to do. But someone else's answer to your problem never quite fits — and doesn't stick.</div>
+    </div>
+    <div class="problem-card">
+      <div class="problem-card-icon">🙊</div>
+      <div class="problem-card-title">No one to think with</div>
+      <div class="problem-card-body">Your therapist is once a week. Your co-founder is too close. Your friends don't get it. You're thinking alone.</div>
+    </div>
+  </div>
+</section>
+
+<!-- WHO IT'S FOR -->
+<section class="who">
+  <div class="section-label">WHO IT'S FOR</div>
+  <h2 class="section-title">Three people who need Untangle.</h2>
+  <div class="personas">
+    <div class="persona">
+      <div class="persona-emoji">🚀</div>
+      <div class="persona-title">The Solo Founder</div>
+      <div class="persona-pain">Making high-stakes decisions alone — fundraising, pivots, hiring — with no sounding board and no senior advisor available at 11pm.</div>
+      <div class="persona-value">→ CLARITY BEFORE EVERY BIG DECISION</div>
+    </div>
+    <div class="persona">
+      <div class="persona-emoji">🧠</div>
+      <div class="persona-title">The Therapist</div>
+      <div class="persona-pain">Clients have breakthroughs in session, then drift between appointments. There's no tool for between-session reflection that isn't a journal.</div>
+      <div class="persona-value">→ BETWEEN-SESSION THINKING TOOL</div>
+    </div>
+    <div class="persona">
+      <div class="persona-emoji">🌀</div>
+      <div class="persona-title">The Overthinker</div>
+      <div class="persona-pain">Career change, relationship, big move — the decision feels impossible because the thinking keeps looping. You need someone to ask the right question.</div>
+      <div class="persona-value">→ GET UNSTUCK IN ONE SESSION</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how">
+  <div class="section-label">HOW IT WORKS</div>
+  <h2 class="section-title">Four steps to clarity.</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Start talking</div>
+      <div class="step-body">No forms. No setup. Just open with whatever's on your mind — messy is fine.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Get questioned</div>
+      <div class="step-body">Untangle asks one sharp question at a time. No advice. No answers. Just the right question.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">Find the knot</div>
+      <div class="step-body">Through the dialogue, the real issue surfaces — the assumption, the fear, the thing you were avoiding.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Get a summary</div>
+      <div class="step-body">After 6–8 exchanges, Untangle summarizes what you figured out. Your thinking, captured.</div>
+    </div>
+  </div>
+</section>
+
+<!-- DIFFERENTIATION -->
+<section class="diff">
+  <div class="section-label">WHY UNTANGLE</div>
+  <h2 class="section-title" style="color:var(--paper);">Not another chatbot.</h2>
+  <div class="diff-grid">
+    <table class="diff-table">
+      <thead>
+        <tr>
+          <th>Others</th>
+          <th>Untangle</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Gives you answers</td><td>Asks you questions</td></tr>
+        <tr><td>Generic AI responses</td><td>Tuned for Socratic dialogue</td></tr>
+        <tr><td>You consume information</td><td>You generate insight</td></tr>
+        <tr><td>Answers don't stick</td><td>Your own realizations do</td></tr>
+        <tr><td>Built for tasks</td><td>Built for thinking</td></tr>
+        <tr><td>No session memory</td><td>Summaries you can save</td></tr>
+      </tbody>
+    </table>
+    <div>
+      <div class="quote-block" style="margin-bottom:24px;">
+        <div class="quote-text">"The quality of your decisions is limited by the quality of your thinking. Not your information."</div>
+        <div class="quote-attr">— THE UNTANGLE THESIS</div>
+      </div>
+      <div class="quote-block">
+        <div class="quote-text">"I figured out in 20 minutes what I'd been stuck on for 3 weeks."</div>
+        <div class="quote-attr">— EARLY BETA USER, FOUNDER</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 30 DAY PLAN -->
+<section class="plan" id="plan">
+  <div class="section-label">30-DAY LAUNCH PLAN</div>
+  <h2 class="section-title">From prototype to paying users<br/>in one month.</h2>
+  <div class="weeks">
+    <div class="week">
+      <div class="week-num">WEEK 1</div>
+      <div class="week-title">Validate</div>
+      <div class="task"><span class="task-dot"></span>Talk to 10 potential users (founders, therapists)</div>
+      <div class="task"><span class="task-dot"></span>Run 5 live Untangle sessions manually</div>
+      <div class="task"><span class="task-dot"></span>Refine the system prompt based on real conversations</div>
+      <div class="task"><span class="task-dot"></span>Identify which persona resonates most</div>
+      <div class="week-goal">GOAL: Confirm people come back for session 2</div>
+    </div>
+    <div class="week">
+      <div class="week-num">WEEK 2</div>
+      <div class="week-title">Build</div>
+      <div class="task"><span class="task-dot"></span>Set up Next.js + Supabase + Clerk auth</div>
+      <div class="task"><span class="task-dot"></span>Add session history & summaries</div>
+      <div class="task"><span class="task-dot"></span>Add tone modes (gentle / challenger)</div>
+      <div class="task"><span class="task-dot"></span>Deploy to Vercel — shareable link</div>
+      <div class="week-goal">GOAL: 20 people using the live product</div>
+    </div>
+    <div class="week">
+      <div class="week-num">WEEK 3</div>
+      <div class="week-title">Distribute</div>
+      <div class="task"><span class="task-dot"></span>Post on Twitter / LinkedIn with a real session story</div>
+      <div class="task"><span class="task-dot"></span>Submit to 3 founder communities (Indie Hackers etc.)</div>
+      <div class="task"><span class="task-dot"></span>DM 10 therapists with a free trial offer</div>
+      <div class="task"><span class="task-dot"></span>Launch on Product Hunt</div>
+      <div class="week-goal">GOAL: 100 signups, 5 paying users</div>
+    </div>
+    <div class="week">
+      <div class="week-num">WEEK 4</div>
+      <div class="week-title">Monetize</div>
+      <div class="task"><span class="task-dot"></span>Add Stripe — $10/mo personal, $25/mo pro</div>
+      <div class="task"><span class="task-dot"></span>Convert free users to paid with 1:1 outreach</div>
+      <div class="task"><span class="task-dot"></span>Pilot B2B offer with 1 coaching firm</div>
+      <div class="task"><span class="task-dot"></span>Set up email retention sequence</div>
+      <div class="week-goal">GOAL: $500 MRR by day 30</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing">
+  <div class="section-label">PRICING</div>
+  <h2 class="section-title">Simple, honest pricing.</h2>
+  <div class="price-grid">
+    <div class="price-card">
+      <div class="price-tier">Personal</div>
+      <div class="price-label">FOR INDIVIDUALS</div>
+      <div class="price-amount">$10</div>
+      <div class="price-desc">per month</div>
+      <div class="price-feature"><span class="check">✓</span> Unlimited sessions</div>
+      <div class="price-feature"><span class="check">✓</span> Session summaries</div>
+      <div class="price-feature"><span class="check">✓</span> Session history</div>
+      <div class="price-feature"><span class="check">✓</span> Tone modes</div>
+    </div>
+    <div class="price-card featured">
+      <div class="featured-badge">MOST POPULAR</div>
+      <div class="price-tier">Pro</div>
+      <div class="price-label" style="color:rgba(245,240,232,0.4)">FOR POWER USERS</div>
+      <div class="price-amount">$25</div>
+      <div class="price-desc" style="color:rgba(245,240,232,0.4)">per month</div>
+      <div class="price-feature"><span class="check">✓</span> Everything in Personal</div>
+      <div class="price-feature"><span class="check">✓</span> Cross-session memory</div>
+      <div class="price-feature"><span class="check">✓</span> Priority AI model</div>
+      <div class="price-feature"><span class="check">✓</span> Export & share summaries</div>
+    </div>
+    <div class="price-card">
+      <div class="price-tier">Teams</div>
+      <div class="price-label">FOR FIRMS & COACHES</div>
+      <div class="price-amount">$299</div>
+      <div class="price-desc">per month · up to 20 seats</div>
+      <div class="price-feature"><span class="check">✓</span> Everything in Pro</div>
+      <div class="price-feature"><span class="check">✓</span> White-label option</div>
+      <div class="price-feature"><span class="check">✓</span> Admin dashboard</div>
+      <div class="price-feature"><span class="check">✓</span> Dedicated onboarding</div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">🧵 Untangle</div>
+    <div class="footer-tagline">THINK OUT LOUD · FIND YOUR ANSWERS</div>
+  </div>
+  <div class="footer-contact">hello@untangle.so</div>
+</footer>
+
+</body>
+</html>

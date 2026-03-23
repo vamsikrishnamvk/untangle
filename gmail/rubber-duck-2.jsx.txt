@@ -1,0 +1,449 @@
+import { useState, useRef, useEffect } from "react";
+
+const SYSTEM_PROMPT = `You are a Socratic thinking partner — a warm, sharp, deeply curious companion for someone trying to think through a problem, decision, or idea.
+
+Your role is NOT to give answers. Your role is to ask the single best question that helps the person think more clearly.
+
+Rules:
+- Ask ONE question at a time. Never two.
+- Never give advice unless explicitly asked.
+- Never summarize back what they said unless it adds something.
+- Gently challenge assumptions.
+- Be warm but intellectually rigorous.
+- If they seem stuck, try a reframe: "What if the opposite were true?"
+- If they seem close to a realization, hold back — let them get there.
+- Occasionally name what you notice: "It sounds like there's some tension between X and Y — is that right?"
+- After 6-8 exchanges, offer a session summary if they want one.
+
+Your questions should feel like they come from a brilliant friend, not a chatbot.`;
+
+const WELCOME = {
+  role: "assistant",
+  content: "Hey. What's tangled up in your head right now? Don't worry about framing it perfectly — just start talking.",
+};
+
+const thinkingPhrases = [
+  "Sitting with that...",
+  "Thinking...",
+  "Hmm...",
+  "Considering...",
+];
+
+export default function RubberDuck() {
+  const [messages, setMessages] = useState([WELCOME]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [thinkingIdx, setThinkingIdx] = useState(0);
+  const [sessionCount, setSessionCount] = useState(0);
+  const bottomRef = useRef(null);
+  const textareaRef = useRef(null);
+  const thinkingInterval = useRef(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  useEffect(() => {
+    if (loading) {
+      thinkingInterval.current = setInterval(() => {
+        setThinkingIdx((i) => (i + 1) % thinkingPhrases.length);
+      }, 1200);
+    } else {
+      clearInterval(thinkingInterval.current);
+    }
+    return () => clearInterval(thinkingInterval.current);
+  }, [loading]);
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = { role: "user", content: input.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const apiMessages = newMessages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: SYSTEM_PROMPT,
+          messages: apiMessages,
+        }),
+      });
+
+      const data = await res.json();
+      const reply = data.content?.map((b) => b.text || "").join("") || "...";
+      setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
+      setSessionCount((c) => c + 1);
+    } catch (e) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Something went wrong. Try again?" },
+      ]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSend();
+    }
+  };
+
+  const handleReset = () => {
+    setMessages([WELCOME]);
+    setSessionCount(0);
+    setInput("");
+  };
+
+  const requestSummary = () => {
+    setInput("Can you summarize what I've figured out in this session?");
+    setTimeout(() => textareaRef.current?.focus(), 50);
+  };
+
+  return (
+    <div style={styles.root}>
+      {/* Ambient background */}
+      <div style={styles.bg} />
+      <div style={styles.bgGlow} />
+
+      {/* Header */}
+      <header style={styles.header}>
+        <div style={styles.headerLeft}>
+          <div style={styles.duckIcon}>🧵</div>
+          <div>
+            <div style={styles.headerTitle}>Untangle</div>
+            <div style={styles.headerSub}>think out loud</div>
+          </div>
+        </div>
+        <div style={styles.headerRight}>
+          {sessionCount >= 6 && (
+            <button style={styles.summaryBtn} onClick={requestSummary}>
+              summarize session
+            </button>
+          )}
+          <button style={styles.resetBtn} onClick={handleReset}>
+            new session
+          </button>
+        </div>
+      </header>
+
+      {/* Messages */}
+      <main style={styles.main}>
+        <div style={styles.messageList}>
+          {messages.map((msg, i) => (
+            <div
+              key={i}
+              style={{
+                ...styles.messageRow,
+                justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+              }}
+            >
+              {msg.role === "assistant" && (
+                <div style={styles.avatar}>🧵</div>
+              )}
+              <div
+                style={{
+                  ...styles.bubble,
+                  ...(msg.role === "user" ? styles.userBubble : styles.aiBubble),
+                  animation: `fadeSlideIn 0.3s ease forwards`,
+                }}
+              >
+                {msg.content}
+              </div>
+            </div>
+          ))}
+
+          {loading && (
+            <div style={{ ...styles.messageRow, justifyContent: "flex-start" }}>
+              <div style={styles.avatar}>🧵</div>
+              <div style={{ ...styles.bubble, ...styles.aiBubble, ...styles.thinkingBubble }}>
+                <span style={styles.thinkingDot} />
+                <span style={styles.thinkingDot} />
+                <span style={styles.thinkingDot} />
+                <span style={styles.thinkingText}>{thinkingPhrases[thinkingIdx]}</span>
+              </div>
+            </div>
+          )}
+
+          <div ref={bottomRef} />
+        </div>
+      </main>
+
+      {/* Input */}
+      <footer style={styles.footer}>
+        <div style={styles.inputWrapper}>
+          <textarea
+            ref={textareaRef}
+            style={styles.textarea}
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Just start talking... (Enter to send, Shift+Enter for newline)"
+            rows={2}
+            disabled={loading}
+          />
+          <button
+            style={{
+              ...styles.sendBtn,
+              opacity: input.trim() && !loading ? 1 : 0.4,
+              cursor: input.trim() && !loading ? "pointer" : "default",
+            }}
+            onClick={handleSend}
+            disabled={!input.trim() || loading}
+          >
+            ↑
+          </button>
+        </div>
+        <div style={styles.hint}>
+          Your space to think freely. No judgement. No advice unless you ask.
+        </div>
+      </footer>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Mono:wght@300;400&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        @keyframes fadeSlideIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes blink {
+          0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+          40% { opacity: 1; transform: scale(1); }
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+      `}</style>
+    </div>
+  );
+}
+
+const styles = {
+  root: {
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    height: "100vh",
+    width: "100%",
+    background: "#0f0e0c",
+    color: "#e8e0d0",
+    fontFamily: "'Lora', Georgia, serif",
+    overflow: "hidden",
+  },
+  bg: {
+    position: "absolute",
+    inset: 0,
+    background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(180,140,60,0.08) 0%, transparent 70%)",
+    pointerEvents: "none",
+  },
+  bgGlow: {
+    position: "absolute",
+    bottom: 0,
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: "600px",
+    height: "300px",
+    background: "radial-gradient(ellipse, rgba(180,140,60,0.05) 0%, transparent 70%)",
+    pointerEvents: "none",
+  },
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: "20px 28px 16px",
+    borderBottom: "1px solid rgba(255,255,255,0.06)",
+    position: "relative",
+    zIndex: 1,
+  },
+  headerLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+  },
+  duckIcon: {
+    fontSize: "28px",
+    filter: "saturate(0.8)",
+  },
+  headerTitle: {
+    fontFamily: "'Lora', serif",
+    fontSize: "18px",
+    fontWeight: "500",
+    color: "#e8e0d0",
+    letterSpacing: "0.02em",
+  },
+  headerSub: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: "10px",
+    color: "rgba(232,224,208,0.35)",
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+    marginTop: "2px",
+  },
+  headerRight: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
+  },
+  summaryBtn: {
+    background: "rgba(180,140,60,0.15)",
+    border: "1px solid rgba(180,140,60,0.3)",
+    color: "rgba(220,190,110,0.9)",
+    padding: "6px 14px",
+    borderRadius: "20px",
+    fontFamily: "'DM Mono', monospace",
+    fontSize: "11px",
+    letterSpacing: "0.05em",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  resetBtn: {
+    background: "transparent",
+    border: "1px solid rgba(255,255,255,0.1)",
+    color: "rgba(232,224,208,0.4)",
+    padding: "6px 14px",
+    borderRadius: "20px",
+    fontFamily: "'DM Mono', monospace",
+    fontSize: "11px",
+    letterSpacing: "0.05em",
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
+  main: {
+    flex: 1,
+    overflowY: "auto",
+    padding: "24px 0",
+    position: "relative",
+    zIndex: 1,
+  },
+  messageList: {
+    maxWidth: "680px",
+    margin: "0 auto",
+    padding: "0 24px",
+    display: "flex",
+    flexDirection: "column",
+    gap: "20px",
+  },
+  messageRow: {
+    display: "flex",
+    alignItems: "flex-end",
+    gap: "10px",
+  },
+  avatar: {
+    fontSize: "20px",
+    marginBottom: "2px",
+    flexShrink: 0,
+    filter: "saturate(0.7)",
+  },
+  bubble: {
+    maxWidth: "82%",
+    padding: "14px 18px",
+    borderRadius: "18px",
+    lineHeight: "1.65",
+    fontSize: "15px",
+  },
+  aiBubble: {
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.07)",
+    color: "#e0d8c8",
+    borderBottomLeftRadius: "4px",
+    fontStyle: "italic",
+  },
+  userBubble: {
+    background: "rgba(180,140,60,0.12)",
+    border: "1px solid rgba(180,140,60,0.2)",
+    color: "#e8e0d0",
+    borderBottomRightRadius: "4px",
+    fontStyle: "normal",
+  },
+  thinkingBubble: {
+    display: "flex",
+    alignItems: "center",
+    gap: "6px",
+    padding: "12px 16px",
+  },
+  thinkingDot: {
+    display: "inline-block",
+    width: "6px",
+    height: "6px",
+    borderRadius: "50%",
+    background: "rgba(180,140,60,0.5)",
+    animation: "blink 1.2s infinite",
+    animationDelay: "calc(var(--i, 0) * 0.2s)",
+  },
+  thinkingText: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: "11px",
+    color: "rgba(232,224,208,0.3)",
+    letterSpacing: "0.05em",
+    marginLeft: "4px",
+  },
+  footer: {
+    padding: "16px 24px 20px",
+    borderTop: "1px solid rgba(255,255,255,0.06)",
+    position: "relative",
+    zIndex: 1,
+    maxWidth: "680px",
+    margin: "0 auto",
+    width: "100%",
+  },
+  inputWrapper: {
+    display: "flex",
+    alignItems: "flex-end",
+    gap: "10px",
+    background: "rgba(255,255,255,0.04)",
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: "16px",
+    padding: "10px 10px 10px 16px",
+    transition: "border-color 0.2s",
+  },
+  textarea: {
+    flex: 1,
+    background: "transparent",
+    border: "none",
+    outline: "none",
+    color: "#e8e0d0",
+    fontFamily: "'Lora', serif",
+    fontSize: "15px",
+    lineHeight: "1.6",
+    resize: "none",
+    minHeight: "44px",
+    maxHeight: "120px",
+  },
+  sendBtn: {
+    width: "36px",
+    height: "36px",
+    borderRadius: "10px",
+    background: "rgba(180,140,60,0.25)",
+    border: "1px solid rgba(180,140,60,0.4)",
+    color: "rgba(220,190,110,0.9)",
+    fontSize: "18px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    transition: "all 0.2s",
+  },
+  hint: {
+    fontFamily: "'DM Mono', monospace",
+    fontSize: "10px",
+    color: "rgba(232,224,208,0.2)",
+    letterSpacing: "0.08em",
+    textAlign: "center",
+    marginTop: "10px",
+  },
+};
