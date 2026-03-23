@@ -109,6 +109,42 @@
     transition: background 0.2s;
   }
 
+  .hero-cta:hover { background: var(--gold-light); }
+
+  .hero-cta-secondary {
+    display: inline-block;
+    margin-top: 14px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: rgba(245,240,232,0.4);
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+
+  .hero-cta-secondary:hover { color: rgba(245,240,232,0.7); }
+
+  .how-cta-wrap {
+    text-align: center;
+    margin-top: 56px;
+  }
+
+  .how-cta {
+    display: inline-block;
+    padding: 14px 36px;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    border-radius: 2px;
+    border: 1px solid rgba(184,134,60,0.4);
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .how-cta:hover { border-color: var(--gold); color: var(--gold-light); }
+
   .hero-right {
     background: var(--cream);
     padding: 64px 56px;
@@ -585,7 +621,9 @@
     <div>
       <h1 class="hero-headline">Stop asking AI<br/>for answers.<br/><em>Start finding<br/>your own.</em></h1>
       <p class="hero-sub">Untangle is an AI thinking partner that asks you the right questions — so you can make better decisions, faster.</p>
-      <a href="#plan" class="hero-cta">SEE THE 30-DAY PLAN →</a>
+      <a href="https://vamsikrishnamvk.github.io/untangle/untangle-app.html" class="hero-cta" target="_blank">TRY UNTANGLE →</a>
+      <br/>
+      <a href="#how" class="hero-cta-secondary">SEE HOW IT WORKS ↓</a>
     </div>
     <div style="font-family:'DM Mono',monospace;font-size:10px;color:rgba(245,240,232,0.2);letter-spacing:0.1em;">
       FOR FOUNDERS · THERAPISTS · INDIVIDUALS
@@ -652,7 +690,7 @@
 </section>
 
 <!-- HOW IT WORKS -->
-<section class="how">
+<section class="how" id="how">
   <div class="section-label">HOW IT WORKS</div>
   <h2 class="section-title">Four steps to clarity.</h2>
   <div class="steps">
@@ -676,6 +714,9 @@
       <div class="step-title">Get a summary</div>
       <div class="step-body">After 6–8 exchanges, Untangle summarizes what you figured out. Your thinking, captured.</div>
     </div>
+  </div>
+  <div class="how-cta-wrap">
+    <a href="https://vamsikrishnamvk.github.io/untangle/untangle-app.html" class="how-cta" target="_blank">→ OPEN UNTANGLE AND TRY IT</a>
   </div>
 </section>
 
